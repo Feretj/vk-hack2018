@@ -5,6 +5,7 @@
 
 body {
   background: #DCDCDC;
+  font-family: 'Roboto', sans-serif;
 }
 
 #hexGrid {
@@ -25,6 +26,14 @@ body {
   outline: 1px solid transparent;
   /* fix for jagged edges in FF on hover transition */
   width: 200px;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  box-shadow: inset 0px 0px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hex:hover {
+  transform: scale(1.2);
+  z-index: 5;
 }
 
 .hex:nth-child(63n+1) {
