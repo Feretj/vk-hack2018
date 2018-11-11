@@ -5,7 +5,8 @@ import axios from "axios";
 import ScrollLock from "react-scrolllock";
 import { hot } from "react-hot-loader";
 import _ from "lodash";
-const qurl = "172.20.10.2:5000";
+import { white } from "ansi-colors";
+const qurl = "172.20.37.68:5000";
 const SearchWrapper = styled.div`
   position: fixed;
   display: flex;
@@ -84,6 +85,23 @@ const ModalW = styled.div`
     visibility: visible;
     opacity: 1;
   `};
+`;
+const ModalG = styled(Modal)`
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  div {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 500px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    img {
+      width: 100%;
+    }
+  }
 `;
 const ModalIn = styled.div`
   height: 100%;
@@ -174,6 +192,8 @@ const Wrapper = styled.div`
   }
   b {
     color: blue;
+    font-size: 30px;
+    line-height: 50px;
   }
 `;
 
@@ -193,6 +213,22 @@ const Image = styled.div`
   `};
   img {
     padding-bottom: 0;
+  }
+`;
+
+const Button = styled.button`
+  border: 2px solid rgb(0, 66, 246);
+  color: rgb(0, 66, 246);
+  background: white;
+  outline: none;
+  border-radius: 20px;
+  font-size: 30px;
+  transition: all 0.2s ease-in-out;
+  padding: 10px;
+  cursor: pointer;
+  :hover {
+    background: rgb(0, 66, 246);
+    color: #ffffff;
   }
 `;
 
@@ -345,11 +381,7 @@ class App extends Component {
           {this.state.memes.map(({ id, url, quiz, generator }) => (
             <li
               className={
-                quiz
-                  ? "hex quiz"
-                  : generator && !generated[generator]
-                    ? "generator hex"
-                    : "hex"
+                quiz ? "hex quiz" : generator ? "generator hex" : "hex"
               }
               key={id}
               onClick={() => {
@@ -360,9 +392,7 @@ class App extends Component {
                     })
                     .then(({ data }) => this.setState({ quiz: data }));
                 } else if (generator) {
-                  if (generated[generator])
-                    this.setState({ generatedId: generator });
-                  else document.getElementById("generator").click();
+                  document.getElementById("generator" + generator).click();
                 } else {
                   axios
                     .get(`http://${qurl}/memes`, { params: { id } })
@@ -416,73 +446,69 @@ class App extends Component {
                       <g />
                     </svg>
                   )}
-                  {generator &&
-                    (generated[generator] ? (
-                      <img src={generated[generator]} alt="" />
-                    ) : (
-                      <React.Fragment>
-                        <input
-                          type="file"
-                          id="generator"
-                          style={{ display: "none" }}
-                          onChange={() => {
-                            var data = new FormData();
-                            data.append("id", generator);
-                            data.append(
-                              "file",
-                              document.getElementById("generator").files[0]
-                            );
-                            axios
-                              .post(`http://${qurl}/generate`, data)
-                              .then(({ data }) => {
-                                this.setState(({ generated }) => ({
-                                  generated: {
-                                    ...generated,
-                                    [generator]:
-                                      "http://" +
-                                      qurl +
-                                      "/static/" +
-                                      data.result
-                                  }
-                                }));
-                              });
-                          }}
+                  {generator && (
+                    <React.Fragment>
+                      <input
+                        type="file"
+                        id={"generator" + generator}
+                        style={{ display: "none" }}
+                        onChange={() => {
+                          var data = new FormData();
+                          data.append("id", generator);
+                          data.append(
+                            "file",
+                            document.getElementById("generator" + generator)
+                              .files[0]
+                          );
+                          axios
+                            .post(`http://${qurl}/generate`, data)
+                            .then(({ data }) => {
+                              this.setState(({ generated }) => ({
+                                generated: {
+                                  ...generated,
+                                  [generator]:
+                                    "http://" + qurl + "/static/" + data.result
+                                },
+                                generatedId: generator
+                              }));
+                            });
+                        }}
+                      />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        version="1.1"
+                        id="Capa_1"
+                        x="0px"
+                        y="0px"
+                        viewBox="0 0 42 42"
+                        width="100px"
+                        height="100px"
+                        style={{
+                          enableBackground: "new 0 0 365.442 365.442"
+                        }}
+                      >
+                        <path
+                          d="M37.059,16H26V4.941C26,2.224,23.718,0,21,0s-5,2.224-5,4.941V16H4.941C2.224,16,0,18.282,0,21s2.224,5,4.941,5H16v11.059  C16,39.776,18.282,42,21,42s5-2.224,5-4.941V26h11.059C39.776,26,42,23.718,42,21S39.776,16,37.059,16z"
+                          fill="#FFFFFF"
                         />
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          version="1.1"
-                          id="Capa_1"
-                          x="0px"
-                          y="0px"
-                          viewBox="0 0 42 42"
-                          width="100px"
-                          height="100px"
-                          style={{
-                            enableBackground: "new 0 0 365.442 365.442"
-                          }}
-                        >
-                          <path
-                            d="M37.059,16H26V4.941C26,2.224,23.718,0,21,0s-5,2.224-5,4.941V16H4.941C2.224,16,0,18.282,0,21s2.224,5,4.941,5H16v11.059  C16,39.776,18.282,42,21,42s5-2.224,5-4.941V26h11.059C39.776,26,42,23.718,42,21S39.776,16,37.059,16z"
-                            fill="#FFFFFF"
-                          />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                          <g />
-                        </svg>
-                      </React.Fragment>
-                    ))}
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                        <g />
+                      </svg>
+                    </React.Fragment>
+                  )}
                 </div>
               </div>
             </li>
@@ -530,22 +556,17 @@ class App extends Component {
               )}
           </ModalW>
         </Modal>
-        <Modal
+        <ModalG
           open={!!generatedId}
           id="modal"
           onClick={e => {
             if (e.target.id === "modal") this.setState({ generatedId: null });
           }}
         >
-          <ModalW open={!!generatedId}>
-            <ModalIn>
-              <div>
-                {generatedId && <img src={generated[generatedId]} alt="" />}
-                <h2>Your stupid meme</h2>
-              </div>
-            </ModalIn>
-          </ModalW>
-        </Modal>
+          <div>
+            {generatedId && <img src={generated[generatedId]} alt="" />}
+          </div>
+        </ModalG>
         <Modal
           open={!!quiz}
           id="modal"
@@ -600,8 +621,7 @@ class App extends Component {
                   {"/"}
                   {quiz && quiz.questions.length}
                 </b>
-                <button
-                  className="w3-btn w3-white w3-border w3-border-red w3-text-red w3-round-large"
+                <Button
                   onClick={() => {
                     const el = document.createElement("textarea");
                     el.value = "http://localhost:3000/#" + quiz.id;
@@ -612,7 +632,7 @@ class App extends Component {
                   }}
                 >
                   Copy link
-                </button>
+                </Button>
               </div>
             </ModalIn>
           </ModalW>
